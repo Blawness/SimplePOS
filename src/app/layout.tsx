@@ -1,11 +1,11 @@
-import type {Metadata} from 'next';
-import './globals.css';
-import { Toaster } from "@/components/ui/toaster"
+import type { Metadata } from 'next'
+import './globals.css'
+import { Toaster } from '@/components/ui/toaster'
 
 export const metadata: Metadata = {
   title: 'Shadcn POS',
-  description: 'A Point of Sales application built with Next.js and Shadcn UI.',
-};
+  description: 'A Point of Sales application built with Next.js and Shadcn UI.'
+}
 
 export default function RootLayout({
   children,

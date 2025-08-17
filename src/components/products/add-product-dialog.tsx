@@ -1,11 +1,11 @@
 "use client"
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { PlusCircle } from "lucide-react"
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { PlusCircle } from 'lucide-react'
 
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -22,17 +22,18 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { useToast } from "@/hooks/use-toast"
-import { categories } from "@/lib/data"
+} from '@/components/ui/select'
+import { useToast } from '@/hooks/use-toast'
+import useSWR from 'swr'
+import { fetcher } from '@/lib/utils'
 
 const productSchema = z.object({
   name: z.string().min(3, { message: "Nama produk minimal 3 karakter." }),
@@ -45,6 +46,7 @@ type ProductFormValues = z.infer<typeof productSchema>
 
 export function AddProductDialog() {
   const { toast } = useToast()
+  const { data: categories } = useSWR('/api/categories', fetcher)
   
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -55,13 +57,26 @@ export function AddProductDialog() {
     },
   })
 
-  function onSubmit(data: ProductFormValues) {
-    console.log(data)
-    toast({
-      title: "Produk Ditambahkan",
-      description: `${data.name} telah berhasil ditambahkan.`,
+  async function onSubmit (data: ProductFormValues) {
+    const res = await fetch('/api/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: data.name,
+        price: data.price,
+        stock: data.stock,
+        categoryId: data.categoryId,
+        image: 'https://placehold.co/300x300.png'
+      })
     })
-    // Here you would typically call an API to save the product
+    if (!res.ok) {
+      toast({ title: 'Gagal', description: 'Gagal menambahkan produk', variant: 'destructive' })
+      return
+    }
+    toast({
+      title: 'Produk Ditambahkan',
+      description: `${data.name} telah berhasil ditambahkan.`
+    })
   }
 
   return (
@@ -133,7 +148,7 @@ export function AddProductDialog() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {categories.map((category) => (
+                      {categories?.map((category: { id: string, name: string }) => (
                         <SelectItem key={category.id} value={category.id}>
                           {category.name}
                         </SelectItem>

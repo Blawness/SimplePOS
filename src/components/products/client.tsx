@@ -1,19 +1,20 @@
 "use client"
 
-import { useState } from "react"
+import { useState } from 'react'
 import { DataTable } from "@/components/ui/data-table"
-import { columns } from "./columns"
-import type { Product } from "@/lib/types"
-import { Input } from "@/components/ui/input"
+import { columns } from './columns'
+import type { Product } from '@/lib/types'
+import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { AddProductDialog } from "./add-product-dialog"
-import { categories } from "@/lib/data"
+} from '@/components/ui/select'
+import { AddProductDialog } from './add-product-dialog'
+import useSWR from 'swr'
+import { fetcher } from '@/lib/utils'
 
 interface ProductsClientProps {
   products: Product[]
@@ -23,6 +24,7 @@ export function ProductsClient({ products }: ProductsClientProps) {
   const [filteredProducts, setFilteredProducts] = useState(products)
   const [nameFilter, setNameFilter] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("all")
+  const { data: categories } = useSWR('/api/categories', fetcher)
 
   const handleFilterChange = (name: string, category: string) => {
     let newFilteredProducts = products
@@ -72,7 +74,7 @@ export function ProductsClient({ products }: ProductsClientProps) {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Kategori</SelectItem>
-            {categories.map((category) => (
+            {categories?.map((category: { id: string, name: string }) => (
               <SelectItem key={category.id} value={category.id}>
                 {category.name}
               </SelectItem>

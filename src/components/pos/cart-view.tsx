@@ -32,7 +32,8 @@ export function CartView() {
   }, [])
 
   const handlePrint = useReactToPrint({
-    content: () => receiptRef.current,
+    // v3 API avoids findDOMNode by using a ref directly
+    contentRef: receiptRef,
     documentTitle: "Struk Pembayaran",
     onAfterPrint: () => {
       clearCart()

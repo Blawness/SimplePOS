@@ -1,10 +1,10 @@
 "use client"
 
-import { ColumnDef } from "@tanstack/react-table"
-import Image from "next/image"
-import { MoreHorizontal, ArrowUpDown } from "lucide-react"
+import { ColumnDef } from '@tanstack/react-table'
+import Image from 'next/image'
+import { MoreHorizontal, ArrowUpDown } from 'lucide-react'
 
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,25 +12,25 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Badge } from "@/components/ui/badge"
-import type { Product } from "@/lib/types"
+} from '@/components/ui/dropdown-menu'
+import { Badge } from '@/components/ui/badge'
+import type { Product } from '@/lib/types'
 
 const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
     minimumFractionDigits: 0,
   }).format(amount)
 }
 
 export const columns: ColumnDef<Product>[] = [
   {
-    accessorKey: "image",
-    header: "Gambar",
+    accessorKey: 'image',
+    header: 'Gambar',
     cell: ({ row }) => (
       <Image
-        src={row.getValue("image")}
+        src={row.getValue('image')}
         alt={row.original.name}
         width={40}
         height={40}
@@ -40,12 +40,12 @@ export const columns: ColumnDef<Product>[] = [
     ),
   },
   {
-    accessorKey: "name",
+    accessorKey: 'name',
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
           Nama
           <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -54,26 +54,26 @@ export const columns: ColumnDef<Product>[] = [
     },
   },
   {
-    accessorKey: "price",
+    accessorKey: 'price',
     header: () => <div className="text-right">Harga</div>,
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("price"))
+      const amount = parseFloat(row.getValue('price'))
       return <div className="text-right font-medium">{formatCurrency(amount)}</div>
     },
   },
   {
-    accessorKey: "stock",
-    header: "Stok",
+    accessorKey: 'stock',
+    header: 'Stok',
   },
   {
-    accessorKey: "category",
-    header: "Kategori",
+    accessorKey: 'category',
+    header: 'Kategori',
     cell: ({ row }) => {
       return <Badge variant="outline">{row.original.category.name}</Badge>
     },
   },
   {
-    id: "actions",
+    id: 'actions',
     cell: ({ row }) => {
       const product = row.original
       return (
