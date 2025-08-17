@@ -56,22 +56,22 @@ export function ProductsClient({ products }: ProductsClientProps) {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-bold tracking-tight font-headline">Products</h2>
+        <h2 className="text-3xl font-bold tracking-tight font-headline">Produk</h2>
         <AddProductDialog />
       </div>
       <div className="flex items-center gap-4">
         <Input
-          placeholder="Filter by product name..."
+          placeholder="Saring berdasarkan nama produk..."
           value={nameFilter}
           onChange={handleNameChange}
           className="max-w-sm"
         />
         <Select value={categoryFilter} onValueChange={handleCategoryChange}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filter by category" />
+            <SelectValue placeholder="Saring berdasarkan kategori" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
+            <SelectItem value="all">Semua Kategori</SelectItem>
             {categories.map((category) => (
               <SelectItem key={category.id} value={category.id}>
                 {category.name}

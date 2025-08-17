@@ -35,10 +35,10 @@ import { useToast } from "@/hooks/use-toast"
 import { categories } from "@/lib/data"
 
 const productSchema = z.object({
-  name: z.string().min(3, { message: "Product name must be at least 3 characters." }),
-  price: z.coerce.number().positive({ message: "Price must be a positive number." }),
-  stock: z.coerce.number().int().nonnegative({ message: "Stock must be a non-negative integer." }),
-  categoryId: z.string({ required_error: "Please select a category." }),
+  name: z.string().min(3, { message: "Nama produk minimal 3 karakter." }),
+  price: z.coerce.number().positive({ message: "Harga harus angka positif." }),
+  stock: z.coerce.number().int().nonnegative({ message: "Stok harus bilangan bulat non-negatif." }),
+  categoryId: z.string({ required_error: "Silakan pilih kategori." }),
 })
 
 type ProductFormValues = z.infer<typeof productSchema>
@@ -58,8 +58,8 @@ export function AddProductDialog() {
   function onSubmit(data: ProductFormValues) {
     console.log(data)
     toast({
-      title: "Product Added",
-      description: `${data.name} has been successfully added.`,
+      title: "Produk Ditambahkan",
+      description: `${data.name} telah berhasil ditambahkan.`,
     })
     // Here you would typically call an API to save the product
   }
@@ -74,9 +74,9 @@ export function AddProductDialog() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add New Product</DialogTitle>
+          <DialogTitle>Tambah Produk Baru</DialogTitle>
           <DialogDescription>
-            Fill in the details of the new product. Click save when you're done.
+            Isi detail produk baru. Klik simpan jika sudah selesai.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -86,9 +86,9 @@ export function AddProductDialog() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Product Name</FormLabel>
+                  <FormLabel>Nama Produk</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Iced Coffee" {...field} />
+                    <Input placeholder="cth., Kopi Susu" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -99,9 +99,9 @@ export function AddProductDialog() {
               name="price"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Price</FormLabel>
+                  <FormLabel>Harga</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="e.g., 25000" {...field} />
+                    <Input type="number" placeholder="cth., 25000" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -112,9 +112,9 @@ export function AddProductDialog() {
               name="stock"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Stock</FormLabel>
+                  <FormLabel>Stok</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="e.g., 100" {...field} />
+                    <Input type="number" placeholder="cth., 100" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -125,11 +125,11 @@ export function AddProductDialog() {
               name="categoryId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category</FormLabel>
+                  <FormLabel>Kategori</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a category" />
+                        <SelectValue placeholder="Pilih kategori" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -145,7 +145,7 @@ export function AddProductDialog() {
               )}
             />
             <DialogFooter>
-              <Button type="submit">Save Product</Button>
+              <Button type="submit">Simpan Produk</Button>
             </DialogFooter>
           </form>
         </Form>

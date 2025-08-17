@@ -27,7 +27,7 @@ const formatCurrency = (amount: number) => {
 export const columns: ColumnDef<Product>[] = [
   {
     accessorKey: "image",
-    header: "Image",
+    header: "Gambar",
     cell: ({ row }) => (
       <Image
         src={row.getValue("image")}
@@ -47,7 +47,7 @@ export const columns: ColumnDef<Product>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Name
+          Nama
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       )
@@ -55,7 +55,7 @@ export const columns: ColumnDef<Product>[] = [
   },
   {
     accessorKey: "price",
-    header: () => <div className="text-right">Price</div>,
+    header: () => <div className="text-right">Harga</div>,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("price"))
       return <div className="text-right font-medium">{formatCurrency(amount)}</div>
@@ -63,11 +63,11 @@ export const columns: ColumnDef<Product>[] = [
   },
   {
     accessorKey: "stock",
-    header: "Stock",
+    header: "Stok",
   },
   {
     accessorKey: "category",
-    header: "Category",
+    header: "Kategori",
     cell: ({ row }) => {
       return <Badge variant="outline">{row.original.category.name}</Badge>
     },
@@ -80,21 +80,21 @@ export const columns: ColumnDef<Product>[] = [
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
+              <span className="sr-only">Buka menu</span>
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Aksi</DropdownMenuLabel>
             <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(product.id)}
             >
-              Copy product ID
+              Salin ID produk
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Edit Product</DropdownMenuItem>
+            <DropdownMenuItem>Ubah Produk</DropdownMenuItem>
             <DropdownMenuItem className="text-destructive">
-              Delete Product
+              Hapus Produk
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -55,18 +55,20 @@ export function CartView() {
     setIsClient(true)
   }, [])
 
+  const totalPrice = getTotalPrice()
+  const isCartEmpty = items.length === 0
+
   if (!isClient) {
     return (
         <Card>
             <CardHeader><CardTitle>Keranjang</CardTitle></CardHeader>
             <CardContent>
-                <div className="text-center p-8">Loading cart...</div>
+                <div className="text-center p-8">Memuat keranjang...</div>
             </CardContent>
         </Card>
     )
   }
 
-  const totalPrice = getTotalPrice()
 
   return (
     <>
@@ -110,7 +112,7 @@ export function CartView() {
               </div>
             </RadioGroup>
           </div>
-          <Button className="w-full mt-2" size="lg" onClick={processPayment} disabled={items.length === 0}>
+          <Button className="w-full mt-2" size="lg" onClick={processPayment} disabled={isCartEmpty}>
             Proses Pembayaran
           </Button>
         </CardFooter>
