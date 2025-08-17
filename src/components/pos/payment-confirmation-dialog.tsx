@@ -81,26 +81,29 @@ export function PaymentConfirmationDialog({
               onValueChange={setPaymentMethod}
               className="grid grid-cols-1 gap-3"
             >
-              <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer">
+              <label 
+                htmlFor="tunai" 
+                className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
+              >
                 <RadioGroupItem value="tunai" id="tunai" />
-                <Label htmlFor="tunai" className="cursor-pointer font-medium">
-                  Tunai
-                </Label>
-              </div>
+                <span className="font-medium">💵 Tunai</span>
+              </label>
               
-              <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer">
+              <label 
+                htmlFor="qris" 
+                className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
+              >
                 <RadioGroupItem value="qris" id="qris" />
-                <Label htmlFor="qris" className="cursor-pointer font-medium">
-                  QRIS
-                </Label>
-              </div>
+                <span className="font-medium">📱 QRIS</span>
+              </label>
               
-              <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer">
+              <label 
+                htmlFor="debit" 
+                className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
+              >
                 <RadioGroupItem value="debit" id="debit" />
-                <Label htmlFor="debit" className="cursor-pointer font-medium">
-                  Debit
-                </Label>
-              </div>
+                <span className="font-medium">💳 Debit</span>
+              </label>
             </RadioGroup>
           </div>
 

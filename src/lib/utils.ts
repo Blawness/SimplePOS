@@ -17,3 +17,12 @@ export const fetcherWithAuth = async (input: RequestInfo | URL, init?: RequestIn
   if (!res.ok) throw new Error('Failed to fetch')
   return res.json()
 }
+
+export const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount)
+}

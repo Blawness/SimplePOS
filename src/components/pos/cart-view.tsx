@@ -11,6 +11,8 @@ import { useToast } from "@/hooks/use-toast"
 import { CartTable } from "./cart-table"
 import { ReceiptPreview } from "./receipt-preview"
 import { PaymentConfirmationDialog } from "./payment-confirmation-dialog"
+import { PaymentResultDialog } from "./payment-result-dialog"
+import type { CartItem } from "@/lib/types"
 
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat("id-ID", {
@@ -22,6 +24,22 @@ const formatCurrency = (amount: number) => {
 
 export function CartView() {
   const [isClient, setIsClient] = useState(false)
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false)
+  const [showPaymentResultDialog, setShowPaymentResultDialog] = useState(false)
+  const [orderName, setOrderName] = useState("")
+  const [paymentMethod, setPaymentMethod] = useState("")
+  const [paymentSuccess, setPaymentSuccess] = useState(true)
+  const [paymentErrorMessage, setPaymentErrorMessage] = useState("")
+  
+  // Separate receipt state to preserve data during printing
+  const [receiptData, setReceiptData] = useState({
+    items: [] as CartItem[],
+    total: 0,
+    tax: 0,
+    orderName: "",
+    paymentMethod: ""
+  })
+  
   const { items, getTotalPrice, clearCart } = useCartStore()
   const { toast } = useToast()
   const receiptRef = useRef<HTMLDivElement>(null)
@@ -39,13 +57,8 @@ export function CartView() {
         const total = getTotalPrice()
         await fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ total }) })
       } catch {}
-      clearCart()
-      toast({
-        title: "Transaksi Berhasil",
-        description: "Pembayaran telah diproses dan keranjang belanja dikosongkan.",
-      })
+      // Cart clearing is now handled in the payment result dialog
     },
-    removeAfterPrint: true,
   })
 
   const processPayment = () => {
@@ -57,7 +70,60 @@ export function CartView() {
       })
       return
     }
+    setShowPaymentDialog(true)
+  }
+
+  const handlePaymentConfirm = async (orderNameValue: string, paymentMethodValue: string) => {
+    setShowPaymentDialog(false)
+    setOrderName(orderNameValue)
+    setPaymentMethod(paymentMethodValue)
+    
+    // Capture receipt data immediately when payment is confirmed
+    const currentTotal = getTotalPrice()
+    const currentTax = currentTotal * 0.11
+    setReceiptData({
+      items: [...items],
+      total: currentTotal,
+      tax: currentTax,
+      orderName: orderNameValue,
+      paymentMethod: paymentMethodValue
+    })
+    
+    try {
+      // Simulate payment processing
+      setPaymentSuccess(true)
+      setPaymentErrorMessage("")
+      
+      // Show payment result dialog
+      setShowPaymentResultDialog(true)
+    } catch (error) {
+      setPaymentSuccess(false)
+      setPaymentErrorMessage("Gagal memproses pembayaran. Silakan coba lagi.")
+      setShowPaymentResultDialog(true)
+    }
+  }
+
+  const handlePrintReceipt = () => {
+    // Use the preserved receipt data for printing
     handlePrint()
+    
+    // Clear cart and show success message after printing
+    setTimeout(() => {
+      clearCart()
+      setOrderName("")
+      setPaymentMethod("")
+      setReceiptData({
+        items: [],
+        total: 0,
+        tax: 0,
+        orderName: "",
+        paymentMethod: ""
+      })
+      toast({
+        title: "Transaksi Berhasil",
+        description: "Pembayaran telah diproses dan keranjang belanja dikosongkan.",
+      })
+    }, 1000) // Wait after printing to clear cart
   }
 
   const totalPrice = getTotalPrice()
@@ -86,7 +152,18 @@ export function CartView() {
   return (
     <>
       <div className="hidden">
-        <ReceiptPreview ref={receiptRef} items={items} total={totalPrice} tax={tax} />
+        <ReceiptPreview 
+          ref={receiptRef} 
+          items={receiptData.items} 
+          total={receiptData.total} 
+          tax={receiptData.tax}
+          orderName={receiptData.orderName}
+          paymentMethod={receiptData.paymentMethod}
+        />
+        {/* Debug info */}
+        <div style={{display: 'none'}}>
+          Debug: orderName="{receiptData.orderName}", paymentMethod="{receiptData.paymentMethod}"
+        </div>
       </div>
       <Card className="flex flex-col h-full">
         <CardHeader>
@@ -112,24 +189,50 @@ export function CartView() {
             </div>
           </div>
           <Separator />
-          <div>
-            <Label className="mb-2 block font-medium">Metode Pembayaran</Label>
-            <RadioGroup defaultValue="cash" className="flex gap-4">
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="cash" id="cash" />
-                <Label htmlFor="cash" className="cursor-pointer">Tunai</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="card" id="card" />
-                <Label htmlFor="card" className="cursor-pointer">Non-Tunai</Label>
-              </div>
-            </RadioGroup>
-          </div>
           <Button className="w-full mt-2" size="lg" onClick={processPayment} disabled={isCartEmpty}>
             Proses Pembayaran
           </Button>
         </CardFooter>
       </Card>
+      
+      {/* Payment Confirmation Dialog */}
+      <PaymentConfirmationDialog
+        isOpen={showPaymentDialog}
+        onClose={() => setShowPaymentDialog(false)}
+        onConfirm={handlePaymentConfirm}
+        totalAmount={totalWithTax}
+      />
+      
+      {/* Payment Result Dialog */}
+      <PaymentResultDialog
+        isOpen={showPaymentResultDialog}
+        onClose={() => {
+          setShowPaymentResultDialog(false)
+          // If user closes without printing, clear cart for successful payments
+          if (paymentSuccess) {
+            clearCart()
+            setOrderName("")
+            setPaymentMethod("")
+            setReceiptData({
+              items: [],
+              total: 0,
+              tax: 0,
+              orderName: "",
+              paymentMethod: ""
+            })
+            toast({
+              title: "Transaksi Berhasil",
+              description: "Pembayaran telah diproses dan keranjang belanja dikosongkan.",
+            })
+          }
+        }}
+        onPrint={handlePrintReceipt}
+        isSuccess={paymentSuccess}
+        orderName={receiptData.orderName}
+        paymentMethod={receiptData.paymentMethod}
+        totalAmount={receiptData.total + receiptData.tax}
+        errorMessage={paymentErrorMessage}
+      />
     </>
   )
 }
