@@ -1,0 +1,86 @@
+"use client"
+
+import { useState } from "react"
+import { DataTable } from "@/components/ui/data-table"
+import { columns } from "./columns"
+import type { Product } from "@/lib/types"
+import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { AddProductDialog } from "./add-product-dialog"
+import { categories } from "@/lib/data"
+
+interface ProductsClientProps {
+  products: Product[]
+}
+
+export function ProductsClient({ products }: ProductsClientProps) {
+  const [filteredProducts, setFilteredProducts] = useState(products)
+  const [nameFilter, setNameFilter] = useState("")
+  const [categoryFilter, setCategoryFilter] = useState("all")
+
+  const handleFilterChange = (name: string, category: string) => {
+    let newFilteredProducts = products
+
+    if (name) {
+      newFilteredProducts = newFilteredProducts.filter((product) =>
+        product.name.toLowerCase().includes(name.toLowerCase())
+      )
+    }
+
+    if (category !== "all") {
+      newFilteredProducts = newFilteredProducts.filter(
+        (product) => product.category.id === category
+      )
+    }
+
+    setFilteredProducts(newFilteredProducts)
+  }
+
+  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newName = event.target.value
+    setNameFilter(newName)
+    handleFilterChange(newName, categoryFilter)
+  }
+
+  const handleCategoryChange = (value: string) => {
+    setCategoryFilter(value)
+    handleFilterChange(nameFilter, value)
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-3xl font-bold tracking-tight font-headline">Products</h2>
+        <AddProductDialog />
+      </div>
+      <div className="flex items-center gap-4">
+        <Input
+          placeholder="Filter by product name..."
+          value={nameFilter}
+          onChange={handleNameChange}
+          className="max-w-sm"
+        />
+        <Select value={categoryFilter} onValueChange={handleCategoryChange}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Filter by category" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Categories</SelectItem>
+            {categories.map((category) => (
+              <SelectItem key={category.id} value={category.id}>
+                {category.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <DataTable columns={columns} data={filteredProducts} />
+    </div>
+  )
+}
