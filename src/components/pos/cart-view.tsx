@@ -21,10 +21,9 @@ const formatCurrency = (amount: number) => {
   }).format(amount)
 }
 
-export function CartView() {
+function CartViewClient() {
   const { items, getTotalPrice, clearCart } = useCartStore()
   const { toast } = useToast()
-  const [isClient, setIsClient] = useState(false)
 
   const receiptRef = useRef<HTMLDivElement>(null)
 
@@ -38,6 +37,7 @@ export function CartView() {
         description: "Pembayaran telah diproses dan keranjang belanja dikosongkan.",
       })
     },
+    removeAfterPrint: true,
   })
 
   const processPayment = () => {
@@ -52,26 +52,10 @@ export function CartView() {
     handlePrint()
   }
 
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
-
   const totalPrice = getTotalPrice()
   const tax = totalPrice * 0.11
   const totalWithTax = totalPrice + tax
   const isCartEmpty = items.length === 0
-
-  if (!isClient) {
-    return (
-        <Card>
-            <CardHeader><CardTitle>Keranjang</CardTitle></CardHeader>
-            <CardContent>
-                <div className="text-center p-8 text-muted-foreground">Memuat keranjang...</div>
-            </CardContent>
-        </Card>
-    )
-  }
-
 
   return (
     <>
@@ -122,4 +106,26 @@ export function CartView() {
       </Card>
     </>
   )
+}
+
+
+export function CartView() {
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  if (!isClient) {
+    return (
+        <Card>
+            <CardHeader><CardTitle>Keranjang</CardTitle></CardHeader>
+            <CardContent>
+                <div className="text-center p-8 text-muted-foreground">Memuat keranjang...</div>
+            </CardContent>
+        </Card>
+    )
+  }
+
+  return <CartViewClient />
 }
