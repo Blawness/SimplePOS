@@ -1,7 +1,7 @@
 
 "use client"
 
-import React, { useRef, useState, useEffect } from "react"
+import React, { useRef, useEffect, useState } from "react"
 import { useReactToPrint } from "react-to-print"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -21,11 +21,15 @@ const formatCurrency = (amount: number) => {
   }).format(amount)
 }
 
-function CartViewClient() {
+export function CartView() {
+  const [isClient, setIsClient] = useState(false)
   const { items, getTotalPrice, clearCart } = useCartStore()
   const { toast } = useToast()
-
   const receiptRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   const handlePrint = useReactToPrint({
     content: () => receiptRef.current,
@@ -56,6 +60,24 @@ function CartViewClient() {
   const tax = totalPrice * 0.11
   const totalWithTax = totalPrice + tax
   const isCartEmpty = items.length === 0
+
+  if (!isClient) {
+    return (
+      <Card className="flex flex-col h-full">
+        <CardHeader>
+          <CardTitle>Keranjang</CardTitle>
+        </CardHeader>
+        <CardContent className="flex-1 overflow-auto p-6">
+          <div className="text-center p-8 text-muted-foreground">Memuat keranjang...</div>
+        </CardContent>
+        <CardFooter className="flex-col !p-6 !items-stretch gap-4 bg-muted/20">
+            <Button className="w-full mt-2" size="lg" disabled>
+                Proses Pembayaran
+            </Button>
+        </CardFooter>
+      </Card>
+    )
+  }
 
   return (
     <>
@@ -106,26 +128,4 @@ function CartViewClient() {
       </Card>
     </>
   )
-}
-
-
-export function CartView() {
-  const [isClient, setIsClient] = useState(false)
-
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
-
-  if (!isClient) {
-    return (
-        <Card>
-            <CardHeader><CardTitle>Keranjang</CardTitle></CardHeader>
-            <CardContent>
-                <div className="text-center p-8 text-muted-foreground">Memuat keranjang...</div>
-            </CardContent>
-        </Card>
-    )
-  }
-
-  return <CartViewClient />
 }
