@@ -1,8 +1,54 @@
 import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
 async function main () {
+  // Roles
+  const roles = ['Admin', 'Kasir', 'Manajer', 'Staff Gudang']
+  const roleRecords = await Promise.all(
+    roles.map(name => prisma.role.upsert({ where: { name }, update: {}, create: { name } }))
+  )
+  const roleByName = Object.fromEntries(roleRecords.map(r => [r.name, r]))
+
+  // Permissions
+  const permissions = [
+    'user.read', 'user.create', 'user.update', 'user.delete',
+    'transaction.read', 'transaction.create',
+    'product.read', 'product.create', 'product.update', 'product.delete',
+    'report.read'
+  ]
+  const permRecords = await Promise.all(
+    permissions.map(name => prisma.permission.upsert({ where: { name }, update: {}, create: { name } }))
+  )
+  const permByName = Object.fromEntries(permRecords.map(p => [p.name, p]))
+
+  // Assign permissions
+  const assign = async (roleName: string, permNames: string[]) => {
+    const role = roleByName[roleName]
+    await prisma.rolePermission.deleteMany({ where: { roleId: role.id } })
+    await prisma.rolePermission.createMany({
+      data: permNames.map(name => ({ roleId: role.id, permissionId: permByName[name].id }))
+    })
+  }
+  await assign('Admin', permissions)
+  await assign('Kasir', ['transaction.create', 'transaction.read', 'product.read'])
+  await assign('Manajer', ['report.read', 'transaction.read', 'product.read'])
+  await assign('Staff Gudang', ['product.read', 'product.update'])
+
+  // Admin user
+  const adminPasswordHash = await bcrypt.hash('Admin#123', 10)
+  await prisma.user.upsert({
+    where: { email: 'admin@example.com' },
+    update: {},
+    create: {
+      name: 'Admin',
+      email: 'admin@example.com',
+      username: 'admin',
+      passwordHash: adminPasswordHash,
+      roleId: roleByName['Admin'].id
+    }
+  })
   // Upsert categories by unique name
   const categoryNames = ['Drinks', 'Snacks', 'Main Course', 'Desserts']
   await Promise.all(

@@ -6,12 +6,11 @@ import { useReactToPrint } from "react-to-print"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Label } from "@/components/ui/label"
 import { useCartStore } from "@/store/cart"
 import { useToast } from "@/hooks/use-toast"
 import { CartTable } from "./cart-table"
 import { ReceiptPreview } from "./receipt-preview"
+import { PaymentConfirmationDialog } from "./payment-confirmation-dialog"
 
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat("id-ID", {
@@ -35,7 +34,11 @@ export function CartView() {
     // v3 API avoids findDOMNode by using a ref directly
     contentRef: receiptRef,
     documentTitle: "Struk Pembayaran",
-    onAfterPrint: () => {
+    onAfterPrint: async () => {
+      try {
+        const total = getTotalPrice()
+        await fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ total }) })
+      } catch {}
       clearCart()
       toast({
         title: "Transaksi Berhasil",

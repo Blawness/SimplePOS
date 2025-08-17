@@ -7,12 +7,12 @@ import { useToast } from '@/hooks/use-toast'
 import { ProductCard } from '@/components/pos/product-card'
 import { CartView } from '@/components/pos/cart-view'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { fetcher } from '@/lib/utils'
+import { fetcherWithAuth } from '@/lib/utils'
 
 export default function PosPage () {
   const { addItem } = useCartStore()
   const { toast } = useToast()
-  const { data: products } = useSWR('/api/products', fetcher)
+  const { data: products } = useSWR('/api/products', (u) => fetcherWithAuth(u))
 
   const handleAddToCart = (product: any) => {
     if (product.stock > 0) {

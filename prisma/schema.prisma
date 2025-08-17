@@ -7,6 +7,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
 model Category {
   id       String    @id @default(cuid())
   name     String    @unique
@@ -23,6 +28,64 @@ model Product {
   category   Category @relation(fields: [categoryId], references: [id])
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+
+model User {
+  id           String     @id @default(cuid())
+  name         String
+  email        String     @unique
+  username     String     @unique
+  passwordHash String
+  status       UserStatus @default(ACTIVE)
+  roleId       String
+  role         Role       @relation(fields: [roleId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  transactions Transaction[]        @relation("UserTransactions")
+  resetTokens  PasswordResetToken[] @relation("UserPasswordResetTokens")
+}
+
+model Role {
+  id          String            @id @default(cuid())
+  name        String            @unique
+  users       User[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  id          String            @id @default(cuid())
+  name        String            @unique
+  description String?
+  roles       RolePermission[]
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role        @relation(fields: [roleId], references: [id])
+  permission   Permission  @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
+}
+
+model Transaction {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation("UserTransactions", fields: [userId], references: [id])
+  total     Int
+  createdAt DateTime @default(now())
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation("UserPasswordResetTokens", fields: [userId], references: [id])
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
 }
 
 

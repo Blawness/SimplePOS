@@ -1,12 +1,16 @@
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { DashboardSidebar } from "@/components/dashboard/sidebar"
 import { UserNav } from "@/components/dashboard/user-nav"
+import { redirect } from 'next/navigation'
+import { getAuthenticatedUser } from '@/lib/auth'
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const user = await getAuthenticatedUser()
+  if (!user) redirect('/login?redirect=/dashboard')
   return (
     <SidebarProvider>
       <DashboardSidebar />
