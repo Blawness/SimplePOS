@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useRef, useState, useEffect } from "react"
@@ -7,7 +8,6 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
 import { useCartStore } from "@/store/cart"
 import { useToast } from "@/hooks/use-toast"
 import { CartTable } from "./cart-table"
@@ -30,11 +30,12 @@ export function CartView() {
 
   const handlePrint = useReactToPrint({
     content: () => receiptRef.current,
+    documentTitle: "Struk Pembayaran",
     onAfterPrint: () => {
       clearCart()
       toast({
         title: "Transaksi Berhasil",
-        description: "Keranjang telah dikosongkan.",
+        description: "Pembayaran telah diproses dan keranjang belanja dikosongkan.",
       })
     },
   })
@@ -43,7 +44,7 @@ export function CartView() {
     if (items.length === 0) {
       toast({
         title: "Keranjang Kosong",
-        description: "Tambahkan produk ke keranjang terlebih dahulu.",
+        description: "Mohon tambahkan produk ke keranjang sebelum melanjutkan pembayaran.",
         variant: "destructive",
       })
       return
@@ -56,6 +57,8 @@ export function CartView() {
   }, [])
 
   const totalPrice = getTotalPrice()
+  const tax = totalPrice * 0.11
+  const totalWithTax = totalPrice + tax
   const isCartEmpty = items.length === 0
 
   if (!isClient) {
@@ -63,7 +66,7 @@ export function CartView() {
         <Card>
             <CardHeader><CardTitle>Keranjang</CardTitle></CardHeader>
             <CardContent>
-                <div className="text-center p-8">Memuat keranjang...</div>
+                <div className="text-center p-8 text-muted-foreground">Memuat keranjang...</div>
             </CardContent>
         </Card>
     )
@@ -73,7 +76,7 @@ export function CartView() {
   return (
     <>
       <div className="hidden">
-        <ReceiptPreview ref={receiptRef} items={items} total={totalPrice} />
+        <ReceiptPreview ref={receiptRef} items={items} total={totalPrice} tax={tax} />
       </div>
       <Card className="flex flex-col h-full">
         <CardHeader>
@@ -82,7 +85,7 @@ export function CartView() {
         <CardContent className="flex-1 overflow-hidden">
           <CartTable />
         </CardContent>
-        <CardFooter className="flex-col !p-6 !items-stretch gap-4">
+        <CardFooter className="flex-col !p-6 !items-stretch gap-4 bg-muted/20">
           <Separator />
           <div>
             <div className="flex justify-between mb-2">
@@ -90,25 +93,25 @@ export function CartView() {
               <span>{formatCurrency(totalPrice)}</span>
             </div>
             <div className="flex justify-between mb-2">
-              <span className="text-muted-foreground">Pajak (10%)</span>
-              <span>{formatCurrency(totalPrice * 0.1)}</span>
+              <span className="text-muted-foreground">Pajak (11%)</span>
+              <span>{formatCurrency(tax)}</span>
             </div>
             <div className="flex justify-between font-bold text-lg">
               <span>Total</span>
-              <span>{formatCurrency(totalPrice * 1.1)}</span>
+              <span>{formatCurrency(totalWithTax)}</span>
             </div>
           </div>
           <Separator />
           <div>
-            <Label className="mb-2 block">Metode Pembayaran</Label>
+            <Label className="mb-2 block font-medium">Metode Pembayaran</Label>
             <RadioGroup defaultValue="cash" className="flex gap-4">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="cash" id="cash" />
-                <Label htmlFor="cash">Tunai</Label>
+                <Label htmlFor="cash" className="cursor-pointer">Tunai</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="card" id="card" />
-                <Label htmlFor="card">Non-Tunai</Label>
+                <Label htmlFor="card" className="cursor-pointer">Non-Tunai</Label>
               </div>
             </RadioGroup>
           </div>
