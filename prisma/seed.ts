@@ -97,18 +97,18 @@ async function main () {
 
   await prisma.product.createMany({
     data: [
-      { name: 'Espresso', price: 25000, stock: 100, image: 'https://placehold.co/300x300.png', categoryId: byName['Drinks'].id },
-      { name: 'Caramel Macchiato', price: 45000, stock: 50, image: 'https://placehold.co/300x300.png', categoryId: byName['Drinks'].id },
-      { name: 'Iced Tea', price: 20000, stock: 120, image: 'https://placehold.co/300x300.png', categoryId: byName['Drinks'].id },
-      { name: 'French Fries', price: 30000, stock: 80, image: 'https://placehold.co/300x300.png', categoryId: byName['Snacks'].id },
-      { name: 'Onion Rings', price: 35000, stock: 70, image: 'https://placehold.co/300x300.png', categoryId: byName['Snacks'].id },
-      { name: 'Nasi Goreng', price: 55000, stock: 40, image: 'https://placehold.co/300x300.png', categoryId: byName['Main Course'].id },
-      { name: 'Spaghetti Carbonara', price: 75000, stock: 30, image: 'https://placehold.co/300x300.png', categoryId: byName['Main Course'].id },
-      { name: 'Chicken Steak', price: 95000, stock: 25, image: 'https://placehold.co/300x300.png', categoryId: byName['Main Course'].id },
-      { name: 'Cheesecake', price: 50000, stock: 35, image: 'https://placehold.co/300x300.png', categoryId: byName['Desserts'].id },
-      { name: 'Chocolate Lava', price: 48000, stock: 45, image: 'https://placehold.co/300x300.png', categoryId: byName['Desserts'].id },
-      { name: 'Mineral Water', price: 10000, stock: 200, image: 'https://placehold.co/300x300.png', categoryId: byName['Drinks'].id },
-      { name: 'Chicken Wings', price: 60000, stock: 60, image: 'https://placehold.co/300x300.png', categoryId: byName['Snacks'].id }
+      { name: 'Espresso', price: 25000, stock: 100, image: 'https://picsum.photos/seed/espresso/600/600', categoryId: byName['Drinks'].id },
+      { name: 'Caramel Macchiato', price: 45000, stock: 50, image: 'https://picsum.photos/seed/caramel-macchiato/600/600', categoryId: byName['Drinks'].id },
+      { name: 'Iced Tea', price: 20000, stock: 120, image: 'https://picsum.photos/seed/iced-tea/600/600', categoryId: byName['Drinks'].id },
+      { name: 'French Fries', price: 30000, stock: 80, image: 'https://picsum.photos/seed/french-fries/600/600', categoryId: byName['Snacks'].id },
+      { name: 'Onion Rings', price: 35000, stock: 70, image: 'https://picsum.photos/seed/onion-rings/600/600', categoryId: byName['Snacks'].id },
+      { name: 'Nasi Goreng', price: 55000, stock: 40, image: 'https://picsum.photos/seed/nasi-goreng/600/600', categoryId: byName['Main Course'].id },
+      { name: 'Spaghetti Carbonara', price: 75000, stock: 30, image: 'https://picsum.photos/seed/spaghetti-carbonara/600/600', categoryId: byName['Main Course'].id },
+      { name: 'Chicken Steak', price: 95000, stock: 25, image: 'https://picsum.photos/seed/chicken-steak/600/600', categoryId: byName['Main Course'].id },
+      { name: 'Cheesecake', price: 50000, stock: 35, image: 'https://picsum.photos/seed/cheesecake/600/600', categoryId: byName['Desserts'].id },
+      { name: 'Chocolate Lava', price: 48000, stock: 45, image: 'https://picsum.photos/seed/chocolate-lava-cake/600/600', categoryId: byName['Desserts'].id },
+      { name: 'Mineral Water', price: 10000, stock: 200, image: 'https://picsum.photos/seed/mineral-water/600/600', categoryId: byName['Drinks'].id },
+      { name: 'Chicken Wings', price: 60000, stock: 60, image: 'https://picsum.photos/seed/chicken-wings/600/600', categoryId: byName['Snacks'].id }
     ]
   })
   console.log('Products created:', 12)
