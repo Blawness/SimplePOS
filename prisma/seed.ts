@@ -1,14 +1,35 @@
+import 'dotenv/config'
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
+import path from 'path'
 
+// Resolve path DB ke absolut supaya SQLite bisa buka file (Windows + npx prisma db seed / Git Bash)
+function resolveDatabaseUrl(): void {
+  let url = (process.env.DATABASE_URL || '').trim().replace(/^["']|["']$/g, '')
+  if (!url) url = 'file:./prisma/dev.db'
+  const match = url.match(/^file:(?:\.\/)?(.*)$/)
+  if (!match) return
+  const relativePath = match[1] || 'prisma/dev.db'
+  let absolutePath = path.resolve(process.cwd(), relativePath)
+  let normalized = absolutePath.replace(/\\/g, '/')
+  // Git Bash / MINGW: /c/Users/... -> C:/Users/... agar SQLite bisa buka
+  if (process.platform === 'win32' && normalized.startsWith('/') && /^\/[a-zA-Z]\//.test(normalized)) {
+    normalized = normalized[1].toUpperCase() + ':' + normalized.slice(2)
+  }
+  process.env.DATABASE_URL = `file:${normalized}`
+}
+
+resolveDatabaseUrl()
 const prisma = new PrismaClient()
 
 async function main () {
+  console.log('Seeding database...')
   // Roles
   const roles = ['Admin', 'Kasir', 'Manajer', 'Staff Gudang']
   const roleRecords = await Promise.all(
     roles.map(name => prisma.role.upsert({ where: { name }, update: {}, create: { name } }))
   )
+  console.log('Roles:', roleRecords.map(r => r.name).join(', '))
   const roleByName = Object.fromEntries(roleRecords.map(r => [r.name, r]))
 
   // Permissions
@@ -37,16 +58,23 @@ async function main () {
   await assign('Staff Gudang', ['product.read', 'product.update'])
 
   // Admin user
-  const adminPasswordHash = await bcrypt.hash('Admin#123', 10)
+  const adminPasswordHash = await bcrypt.hash('password', 10)
   await prisma.user.upsert({
     where: { email: 'admin@example.com' },
-    update: {},
+    update: {
+      name: 'Admin',
+      username: 'admin',
+      passwordHash: adminPasswordHash,
+      roleId: roleByName['Admin'].id,
+      status: 'ACTIVE'
+    },
     create: {
       name: 'Admin',
       email: 'admin@example.com',
       username: 'admin',
       passwordHash: adminPasswordHash,
-      roleId: roleByName['Admin'].id
+      roleId: roleByName['Admin'].id,
+      status: 'ACTIVE'
     }
   })
   // Upsert categories by unique name
@@ -83,15 +111,21 @@ async function main () {
       { name: 'Chicken Wings', price: 60000, stock: 60, image: 'https://placehold.co/300x300.png', categoryId: byName['Snacks'].id }
     ]
   })
+  console.log('Products created:', 12)
 }
 
+
 main()
+  .then(() => {
+    console.log('Seed complete')
+  })
   .catch(err => {
-    console.error(err)
+    console.error('Seed failed:', err)
     process.exit(1)
   })
   .finally(async () => {
     await prisma.$disconnect()
   })
+
 
 

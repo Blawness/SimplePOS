@@ -4,7 +4,7 @@ import { jwtVerify } from 'jose'
 
 const AUTH_COOKIE = 'pos_auth'
 
-export async function middleware (req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
   if (pathname.startsWith('/api')) return NextResponse.next()
   if (pathname.startsWith('/login')) return NextResponse.next()
@@ -27,7 +27,5 @@ export async function middleware (req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*']
+  matcher: ['/dashboard/:path*'],
 }
-
-

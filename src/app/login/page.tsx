@@ -122,7 +122,7 @@ function LoginForm() {
           </form>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            Gunakan akun admin bawaan untuk uji coba: admin@example.com / Admin#123
+            Gunakan akun admin bawaan untuk uji coba: admin@example.com / password
           </p>
         </CardContent>
       </Card>

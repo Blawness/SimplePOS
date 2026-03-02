@@ -41,7 +41,10 @@ export function DashboardClient({
 }: DashboardClientProps) {
   // Calculate additional analytics
   const totalSales = monthlySales.reduce((sum, month) => sum + month.sales, 0)
-  const avgMonthlySales = totalSales / monthlySales.length
+  const avgMonthlySales = monthlySales.length > 0 ? totalSales / monthlySales.length : 0
+  const bestMonth = monthlySales.length > 0
+    ? monthlySales.reduce((best, month) => (month.sales > best.sales ? month : best)).month
+    : '-'
   
   // Category distribution
   const categoryStats = categories.map(category => {
@@ -54,7 +57,7 @@ export function DashboardClient({
       productCount: categoryProducts.length,
       totalStock,
       totalValue,
-      percentage: (categoryProducts.length / products.length) * 100
+      percentage: products.length > 0 ? (categoryProducts.length / products.length) * 100 : 0
     }
   }).sort((a, b) => b.totalValue - a.totalValue)
 
@@ -95,11 +98,7 @@ export function DashboardClient({
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>Best Month</span>
-                  <span className="font-medium">
-                    {monthlySales.reduce((best, month) => 
-                      month.sales > best.sales ? month : best
-                    ).month}
-                  </span>
+                  <span className="font-medium">{bestMonth}</span>
                 </div>
               </div>
             </CardContent>
